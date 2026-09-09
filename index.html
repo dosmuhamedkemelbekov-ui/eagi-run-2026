@@ -978,13 +978,19 @@
             submitBtn.textContent = 'Отправляем...';
 
             try {
-                // Отправить заявку в Google Sheets
+                // 1. Сначала отправить заявку в Google Sheets
                 const sheetsResponse = await fetch('https://script.google.com/macros/s/AKfycbw4UfyynzpUjeKj3ZQJBSlkQunl2HRVstsm8lLeSBBIJXkj4euX68ElxWtVKg162kVL/exec', {
                     method: 'POST',
                     body: new URLSearchParams(formData)
                 });
 
-                // Отправить уведомление через Brevo
+                const sheetsResult = await sheetsResponse.json();
+
+                if (!sheetsResult.success) {
+                    throw new Error('Ошибка сохранения заявки');
+                }
+
+                // 2. После успеха - отправить уведомление через Brevo
                 const brevoResponse = await fetch('https://api.brevo.com/v3/smtp/email', {
                     method: 'POST',
                     headers: {
@@ -1014,22 +1020,16 @@
                     })
                 });
 
-                const sheetsResult = await sheetsResponse.json();
+                statusMessage.style.display = 'block';
+                statusMessage.style.background = 'rgba(76, 175, 80, 0.3)';
+                statusMessage.style.color = '#FFFFFF';
+                statusMessage.textContent = '✓ Спасибо! Вы успешно зарегистрированы! Письмо отправлено на вашу почту.';
 
-                if (sheetsResult.success) {
-                    statusMessage.style.display = 'block';
-                    statusMessage.style.background = 'rgba(76, 175, 80, 0.3)';
-                    statusMessage.style.color = '#FFFFFF';
-                    statusMessage.textContent = '✓ Спасибо! Вы успешно зарегистрированы! Письмо отправлено на вашу почту.';
+                registrationForm.reset();
 
-                    registrationForm.reset();
-
-                    setTimeout(() => {
-                        statusMessage.style.display = 'none';
-                    }, 5000);
-                } else {
-                    throw new Error(sheetsResult.message);
-                }
+                setTimeout(() => {
+                    statusMessage.style.display = 'none';
+                }, 5000);
             } catch (error) {
                 statusMessage.style.display = 'block';
                 statusMessage.style.background = 'rgba(244, 67, 54, 0.3)';
