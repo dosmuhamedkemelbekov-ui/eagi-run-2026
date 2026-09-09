@@ -978,45 +978,14 @@
             submitBtn.textContent = 'Отправляем...';
 
             try {
-                // Одновременно отправить в Google Sheets и на Brevo
-                const [sheetsResponse, brevoResponse] = await Promise.all([
-                    fetch('https://script.google.com/macros/s/AKfycbw4UfyynzpUjeKj3ZQJBSlkQunl2HRVstsm8lLeSBBIJXkj4euX68ElxWtVKg162kVL/exec', {
-                        method: 'POST',
-                        body: new URLSearchParams(formData)
-                    }),
-                    fetch('https://api.brevo.com/v3/smtp/email', {
-                        method: 'POST',
-                        headers: {
-                            'api-key': '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',
-                            'Content-Type': 'application/json'
-                        },
-                        body: JSON.stringify({
-                            sender: { email: "dosmuhamedkemelbekov@gmail.com", name: "EAGI RUN 2026" },
-                            to: [{ email: formData.email }],
-                            subject: "Вы зарегистрированы на EAGI RUN 2026! 🏃",
-                            htmlContent: `
-                                <h2>Привет ${formData.firstName}!</h2>
-                                <p>✓ Вы успешно зарегистрировались на EAGI RUN 2026!</p>
-                                <p><strong>Детали забега:</strong></p>
-                                <ul>
-                                    <li>Дистанция: 3 км</li>
-                                    <li>Место: Триатлон-парк, Астана</li>
-                                    <li>Дата: 3 октября 2026 в 9:00</li>
-                                </ul>
-                                <p>📱 Следите за новостями:</p>
-                                <ul>
-                                    <li>Instagram: @eagi.running</li>
-                                    <li>WhatsApp: 87786769033</li>
-                                </ul>
-                                <p>Спасибо за участие! Удачи на забеге! 🎉</p>
-                            `
-                        })
-                    })
-                ]);
+                const response = await fetch('https://script.google.com/macros/s/AKfycbxB-8LIF-ue4glyrCIHkkiNjQf3DDzGWwwl3aDw9GTbm5iDUDhZVcqmFiR3I02cjZ6L/exec', {
+                    method: 'POST',
+                    body: new URLSearchParams(formData)
+                });
 
-                const sheetsResult = await sheetsResponse.json();
+                const result = await response.json();
 
-                if (sheetsResult.success) {
+                if (result.success) {
                     statusMessage.style.display = 'block';
                     statusMessage.style.background = 'rgba(76, 175, 80, 0.3)';
                     statusMessage.style.color = '#FFFFFF';
@@ -1028,7 +997,7 @@
                         statusMessage.style.display = 'none';
                     }, 5000);
                 } else {
-                    throw new Error(sheetsResult.message);
+                    throw new Error(result.message);
                 }
             } catch (error) {
                 statusMessage.style.display = 'block';
