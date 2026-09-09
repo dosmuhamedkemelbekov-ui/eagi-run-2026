@@ -978,50 +978,27 @@
             submitBtn.textContent = 'Отправляем...';
 
             try {
-                // Отправляем email через Brevo
-                const brevoResponse = await fetch('https://api.brevo.com/v3/smtp/email', {
+                const response = await fetch('https://script.google.com/macros/s/AKfycbwC9uUqVhDIDKP6UxoUrtx7cvvqPCJhc38-5z4VtnCE-TaF7pS-gVhBdMypZqIefZxi/exec', {
                     method: 'POST',
-                    headers: {
-                        'api-key': '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',
-                        'Content-Type': 'application/json'
-                    },
-                    body: JSON.stringify({
-                        sender: { email: "dosmuhamedkemelbekov@gmail.com", name: "EAGI RUN 2026" },
-                        to: [{ email: formData.email }],
-                        subject: "Вы зарегистрированы на EAGI RUN 2026! 🏃",
-                        htmlContent: `
-                            <h2>Привет ${formData.firstName}!</h2>
-                            <p>✓ Вы успешно зарегистрировались на EAGI RUN 2026!</p>
-                            <p><strong>Детали забега:</strong></p>
-                            <ul>
-                                <li>Дистанция: 3 км</li>
-                                <li>Место: Триатлон-парк, Астана</li>
-                                <li>Дата: 3 октября 2026 в 9:00</li>
-                            </ul>
-                            <p>📱 Следите за новостями:</p>
-                            <ul>
-                                <li>Instagram: @eagi.running</li>
-                                <li>WhatsApp: 87786769033</li>
-                            </ul>
-                            <p>Спасибо за участие! Удачи на забеге! 🎉</p>
-                        `
-                    })
+                    body: new URLSearchParams(formData)
                 });
 
-                if (!brevoResponse.ok) {
-                    throw new Error('Ошибка отправки email');
+                const result = await response.json();
+
+                if (result.success) {
+                    statusMessage.style.display = 'block';
+                    statusMessage.style.background = 'rgba(76, 175, 80, 0.3)';
+                    statusMessage.style.color = '#FFFFFF';
+                    statusMessage.textContent = '✓ Спасибо! Вы успешно зарегистрированы! Письмо отправлено на вашу почту.';
+
+                    registrationForm.reset();
+
+                    setTimeout(() => {
+                        statusMessage.style.display = 'none';
+                    }, 5000);
+                } else {
+                    throw new Error(result.message);
                 }
-
-                statusMessage.style.display = 'block';
-                statusMessage.style.background = 'rgba(76, 175, 80, 0.3)';
-                statusMessage.style.color = '#FFFFFF';
-                statusMessage.textContent = '✓ Спасибо! Вы успешно зарегистрированы! Письмо отправлено на вашу почту.';
-
-                registrationForm.reset();
-
-                setTimeout(() => {
-                    statusMessage.style.display = 'none';
-                }, 5000);
             } catch (error) {
                 statusMessage.style.display = 'block';
                 statusMessage.style.background = 'rgba(244, 67, 54, 0.3)';
