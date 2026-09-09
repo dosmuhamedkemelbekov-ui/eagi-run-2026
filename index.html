@@ -982,14 +982,12 @@
             try {
                 const response = await fetch(GOOGLE_APPS_SCRIPT_URL, {
                     method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json'
-                    },
-                    body: JSON.stringify(formData),
-                    mode: 'no-cors'
+                    body: new URLSearchParams(formData)
                 });
 
-                // With no-cors mode, we can't read the response, so we assume success if the request completes
+                const result = await response.text();
+                console.log('Response:', result);
+
                 statusMessage.style.display = 'block';
                 statusMessage.style.background = 'rgba(76, 175, 80, 0.3)';
                 statusMessage.style.color = '#FFFFFF';
@@ -1006,7 +1004,7 @@
                 statusMessage.style.display = 'block';
                 statusMessage.style.background = 'rgba(244, 67, 54, 0.3)';
                 statusMessage.style.color = '#FFFFFF';
-                statusMessage.textContent = '✗ Ошибка: ' + (error.message || 'Не удалось отправить форму. Проверьте интернет-соединение.');
+                statusMessage.textContent = '✗ Ошибка: ' + error.message;
             } finally {
                 submitBtn.disabled = false;
                 submitBtn.textContent = originalText;
