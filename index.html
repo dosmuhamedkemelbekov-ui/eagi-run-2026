@@ -1020,6 +1020,12 @@
                     })
                 });
 
+                if (!brevoResponse.ok) {
+                    const brevoError = await brevoResponse.text();
+                    console.error('Brevo error:', brevoError);
+                    throw new Error('Ошибка Brevo: ' + brevoResponse.status);
+                }
+
                 statusMessage.style.display = 'block';
                 statusMessage.style.background = 'rgba(76, 175, 80, 0.3)';
                 statusMessage.style.color = '#FFFFFF';
